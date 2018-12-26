@@ -1,3 +1,5 @@
+Based on this tutorial https://medium.com/linedevth/line-bot-101-447e427d62c7
+
 # line-bot-nodejs-starter
 starter point to create new line bot project
 
