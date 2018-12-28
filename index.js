@@ -1,5 +1,3 @@
-'use strict';
-
 const line = require('@line/bot-sdk');
 const express = require('express');
 const config = require('./config.json');
@@ -9,6 +7,9 @@ const client = new line.Client(config);
 
 const app = express();
 
+app.get('/', function (req, res) {
+  res.send('owlery main page. There is nothing here yet. It should be something here soon!!! ((o(´∀｀)o))')
+})
 // webhook callback
 app.post('/webhook', line.middleware(config), (req, res) => {
   // req.body.events should be an array of events
