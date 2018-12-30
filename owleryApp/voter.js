@@ -52,9 +52,9 @@ const styles = StyleSheet.create({
   swiperContainer: {
     height: 30,
     width: SCREEN_WIDTH - 40,
-    backgroundColor: "black",
     borderRadius: 5,
     overflow: 'hidden',
+    zIndex: 0,
   },
   guide: {
     fontFamily: 'Raleway',
@@ -70,31 +70,47 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection:'row',
   },
-  leftSwipe: {
+  leftSide: {
     flex: 1,
     paddingRight: 20,
     justifyContent: 'center',
     alignItems: 'flex-end',
     backgroundColor: colors.primary,
+    zIndex: 500,
   },
-  rightSwipe: {
+  rightSide: {
     flex: 1,
     paddingLeft: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
     backgroundColor: colors.lightgray,
+    zIndex: 500,
   },
   swiperLabelFake: {
     fontFamily: 'Raleway-Bold',
     textTransform: 'uppercase',
     letterSpacing: 3,
     color: colors.semigray,
+    zIndex: 501,
   },
   swiperLabelReal: {
     fontFamily: 'Raleway-Bold',
     textTransform: 'uppercase',
     letterSpacing: 3,
     color: 'white',
+    zIndex: 501,
+  },
+  leftSwipe: {
+    flex: 1,
+    paddingRight: 20,
+    backgroundColor: colors.primary,
+    zIndex: 200,
+  },
+  rightSwipe: {
+    flex: 1,
+    paddingRight: 20,
+    backgroundColor: colors.lightgray,
+    zIndex: 200,
   },
   buttonBar: {
     flexDirection: 'row',
@@ -138,7 +154,8 @@ class Voter extends React.Component {
 
     this.position = new Animated.ValueXY()
     this.state = {
-      currentIndex: 0
+      currentIndex: 0,
+      swipecolor: colors.primary,
     }
   }
 
@@ -147,9 +164,33 @@ class Voter extends React.Component {
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderMove: (evt, gestureState) => {
         this.position.setValue({ x: gestureState.dx, y: 0 })
+        if(gestureState.dx > 0){
+          this.setState({ swipecolor: colors.lightgray })
+        } else {
+          this.setState({ swipecolor: colors.primary })
+        }
       },
       onPanResponderRelease: (evt, gestureState) => {
-
+        if( gestureState.dx > SCREEN_WIDTH/4.0 ){
+          Animated.spring(this.position, {
+            toValue: {x: SCREEN_WIDTH + 100, y: 0}
+          }).start(() => {
+            this.setState({ currentIndex: this.state.currentIndex+1 }, () =>
+              this.position.setValue({ x: 0, y: 0}))
+          })
+        } else if( gestureState.dx < -SCREEN_WIDTH/4.0 ){
+          Animated.spring(this.position, {
+            toValue: {x: -SCREEN_WIDTH - 100, y: 0}
+          }).start(() => {
+            this.setState({ currentIndex: this.state.currentIndex+1}, () =>
+              this.position.setValue({ x: 0, y: 0}))
+          })
+        } else {
+          Animated.spring(this.position, {
+            toValue: {x: 0, y: 0},
+            friction: 4,
+          }).start()
+        }
       }
     })
   }
@@ -183,15 +224,23 @@ class Voter extends React.Component {
               swipe left or right to vote
             </Text>
           </View>
-          <View style={ styles.swiperContainer }>
+          <View style={[ { backgroundColor: this.state.swipecolor }, styles.swiperContainer ]}>
             <Animated.View
               {...this.PanResponder.panHandlers}
               style={[{ transform: this.position.getTranslateTransform() }, styles.swiper ]}>
-              <View style={ styles.rightSwipe }>
+              <View style={ styles.rightSide }>
                 <Text style={ styles.swiperLabelFake }>Fake</Text>
               </View>
-              <View style={ styles.leftSwipe }>
+              <View style={ styles.leftSide }>
                 <Text style={ styles.swiperLabelReal }>Real</Text>
+              </View>
+            </Animated.View>
+            <Animated.View>
+              <View style={[ { opacity: this.realOpac }, styles.leftSwipe ]}>
+              </View>
+            </Animated.View>
+            <Animated.View>
+              <View style={[ { opacity: this.fakeOpac }, styles.rightSwipe ]}>
               </View>
             </Animated.View>
           </View>
