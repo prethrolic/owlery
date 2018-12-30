@@ -50,10 +50,13 @@ const styles = StyleSheet.create({
     overflow: 'scroll',
   },
   swiperContainer: {
-    height: 30,
+    height: 50,
+    marginTop: 20,
+    marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
     width: SCREEN_WIDTH - 40,
     borderRadius: 5,
-    overflow: 'hidden',
     zIndex: 0,
   },
   guide: {
@@ -62,61 +65,53 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.darkgray,
     fontSize: 14,
-    marginBottom: 20,
   },
   swiper: {
-    height: 30,
+    height: 140,
     width: SCREEN_WIDTH - 40,
     flex: 1,
     flexDirection:'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    overflow: 'hidden',
   },
-  leftSide: {
+  leftSwipe: {
     flex: 1,
+    height: 50,
     paddingRight: 20,
     justifyContent: 'center',
     alignItems: 'flex-end',
     backgroundColor: colors.primary,
-    zIndex: 500,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
   },
-  rightSide: {
+  rightSwipe: {
     flex: 1,
+    height: 50,
     paddingLeft: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
     backgroundColor: colors.lightgray,
-    zIndex: 500,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
   },
   swiperLabelFake: {
     fontFamily: 'Raleway-Bold',
     textTransform: 'uppercase',
     letterSpacing: 3,
     color: colors.semigray,
-    zIndex: 501,
   },
   swiperLabelReal: {
     fontFamily: 'Raleway-Bold',
     textTransform: 'uppercase',
     letterSpacing: 3,
     color: 'white',
-    zIndex: 501,
-  },
-  leftSwipe: {
-    flex: 1,
-    paddingRight: 20,
-    backgroundColor: colors.primary,
-    zIndex: 200,
-  },
-  rightSwipe: {
-    flex: 1,
-    paddingRight: 20,
-    backgroundColor: colors.lightgray,
-    zIndex: 200,
   },
   buttonBar: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
   },
   circleButton: {
     height: 50,
@@ -221,26 +216,18 @@ class Voter extends React.Component {
         <View style={ styles.footer }>
           <View>
             <Text style={ styles.guide }>
-              swipe left or right to vote
+              &lt;&lt; swipe left or right to vote &gt;&gt;
             </Text>
           </View>
           <View style={[ { backgroundColor: this.state.swipecolor }, styles.swiperContainer ]}>
             <Animated.View
               {...this.PanResponder.panHandlers}
               style={[{ transform: this.position.getTranslateTransform() }, styles.swiper ]}>
-              <View style={ styles.rightSide }>
+              <View style={ styles.rightSwipe }>
                 <Text style={ styles.swiperLabelFake }>Fake</Text>
               </View>
-              <View style={ styles.leftSide }>
+              <View style={ styles.leftSwipe }>
                 <Text style={ styles.swiperLabelReal }>Real</Text>
-              </View>
-            </Animated.View>
-            <Animated.View>
-              <View style={[ { opacity: this.realOpac }, styles.leftSwipe ]}>
-              </View>
-            </Animated.View>
-            <Animated.View>
-              <View style={[ { opacity: this.fakeOpac }, styles.rightSwipe ]}>
               </View>
             </Animated.View>
           </View>
