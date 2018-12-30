@@ -1,15 +1,13 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const config = require('./config.json');
+var mysql = require('mysql');
 
-// create LINE SDK client
+//----- begin stuff for LINE -v-
 const client = new line.Client(config);
 
 const app = express();
 
-app.get('/', function (req, res) {
-  res.send('owlery main page. There is nothing here yet. It should be something here soon!!! ((o(´∀｀)o))')
-})
 // webhook callback
 app.post('/webhook', line.middleware(config), (req, res) => {
   // req.body.events should be an array of events
@@ -112,6 +110,32 @@ function handleLocation(message, replyToken) {
 function handleSticker(message, replyToken) {
   return replyText(replyToken, 'Got Sticker');
 }
+//-------end line stuff -w-
+var sqlcon = mysql.createConnection({
+  host: "localhost",
+  user: "owlery",
+  password: "owlerypw23",
+  database : 'owlery_db',
+  insecureAuth : true
+});
+
+sqlcon.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected to mysql database");
+});
+
+app.get('/', function (req, res) {
+  res.send('owlery main page. There is nothing here yet. It should be something here soon!!! ((o(´∀｀)o))')
+})
+app.get('/test', function (req, res) {
+  sqlString = 'SELECT * FROM news'
+  sqlcon.query(sqlString, function (err, result) {
+      if (err){
+        res.send("Error:" + err)
+      }
+      res.send("Result: " + result);
+    });
+})
 
 const port = config.port;
 app.listen(port, () => {
