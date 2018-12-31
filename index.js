@@ -17,7 +17,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
   // handle events separately
   Promise.all(req.body.events.map(event => {
     console.log('event', event);
-    // check verify webhook event
+    // this is only for LINE webhook verification from LINE developer control panel
     if (event.replyToken === '00000000000000000000000000000000' ||
       event.replyToken === 'ffffffffffffffffffffffffffffffff') {
       return;
