@@ -16,7 +16,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
   }
   // handle events separately
   Promise.all(req.body.events.map(event => {
-    console.log('event', event);
+    console.log("get event, text:",event.message.text);
     // this is only for LINE webhook verification from LINE developer control panel
     if (event.replyToken === '00000000000000000000000000000000' ||
       event.replyToken === 'ffffffffffffffffffffffffffffffff') {
@@ -88,7 +88,18 @@ function handleEvent(event) {
 }
 
 function handleText(message, replyToken) {
-  return replyText(replyToken, message.text);
+  // insert text to local DATABASE
+/*  sqlString = 'INSERT IGNORE INTO news ()'
+  sqlcon.query(sqlString, function (err, result) {
+      if (err){
+        res.send("Error:" + err)
+      }
+      res.send("Result: " + result);
+    });*/
+//  return replyText(replyToken, "🛑 According to my knowledge, this news seems to be ⚠️ FAKE ⚠️ . Using your own discretion and further research are strongly suggested. ");
+  return replyText(replyToken, "⭐️ 🆗 ⭐️ This news seems to be ⭐️ REAL ⭐️. There are a lot of verifiers think that this is real.");
+  //return replyText(replyToken, "🛑 I think this is a ⚠️ FAKE ⚠️ news. There are a lot of verifiers think that this is fake. Using your own discretion and further research are strongly suggested.");
+
 }
 
 function handleImage(message, replyToken) {
