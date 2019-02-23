@@ -149,12 +149,18 @@ class Voter extends React.Component {
 
     this.position = new Animated.ValueXY()
     this.state = {
-      currentIndex: 0,
+      fakeVote: 5 /* query from db*/,
+      realVote: 2 /*query from db*/,
+      voted: false /* Vote Flag, query from db (with authentication)*/,
       swipecolor: colors.primary,
     }
   }
 
   componentWillMount(){
+    const vote = {
+      fake: this.state.fakeVote,
+      real: this.state.RealVote
+    }
     this.PanResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderMove: (evt, gestureState) => {
@@ -170,14 +176,14 @@ class Voter extends React.Component {
           Animated.spring(this.position, {
             toValue: {x: SCREEN_WIDTH + 100, y: 0}
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex+1 }, () =>
+            this.setState({ fakeVote: this.state.fakeVote + 1, voted: true }, () =>
               this.position.setValue({ x: 0, y: 0}))
           })
         } else if( gestureState.dx < -SCREEN_WIDTH/4.0 ){
           Animated.spring(this.position, {
             toValue: {x: -SCREEN_WIDTH - 100, y: 0}
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex+1}, () =>
+            this.setState({ realVote: this.state.realVote + 1, voted: true }, () =>
               this.position.setValue({ x: 0, y: 0}))
           })
         } else {
@@ -191,6 +197,58 @@ class Voter extends React.Component {
   }
 
   render(){
+    const voted = this.state.voted
+    const vote = {
+      fake: this.state.fakeVote,
+      real: this.state.realVote
+    }
+    const ratio = {
+      fake: (vote.fake/(vote.real + vote.fake)),
+      real: (vote.real/(vote.real + vote.fake))
+    }
+    let guide_message
+    let vsbar
+
+    if (voted) {
+        vsbar =
+        <View style={styles.swiperContainer }>
+          <View style={ styles.swiper }>
+            <View
+              style={[
+                styles.rightSwipe,
+                { flex: ratio.fake, alignItems: 'center' }
+              ]}
+            >
+              <Text style={ styles.swiperLabelFake }>{ (ratio.fake * 100).toFixed(0) }%</Text>
+            </View>
+            <View
+              style={[
+                styles.leftSwipe,
+                { flex: ratio.real, alignItems: 'center' }
+              ]}
+            >
+              <Text style={ styles.swiperLabelReal }>{ (ratio.real* 100).toFixed(0) }%</Text>
+            </View>
+          </View>
+        </View>;
+
+      guide_message = <Text style={ styles.guide }>&lt;&lt; vote result &gt;&gt;</Text>;
+    } else {
+      vsbar = <View style={[ { backgroundColor: this.state.swipecolor }, styles.swiperContainer ]}>
+        <Animated.View
+          {...this.PanResponder.panHandlers}
+          style={[{ transform: this.position.getTranslateTransform() }, styles.swiper ]}>
+          <View style={ styles.rightSwipe }>
+            <Text style={ styles.swiperLabelFake }>Fake</Text>
+          </View>
+          <View style={ styles.leftSwipe }>
+            <Text style={ styles.swiperLabelReal }>Real</Text>
+          </View>
+        </Animated.View>
+      </View>;
+
+      guide_message = <Text style={ styles.guide }>&lt;&lt; swipe left or right to vote &gt;&gt;</Text>;
+    }
     return(
       <View style={ styles.container }>
         <View style={ styles.header }>
@@ -215,22 +273,9 @@ class Voter extends React.Component {
 
         <View style={ styles.footer }>
           <View>
-            <Text style={ styles.guide }>
-              &lt;&lt; swipe left or right to vote &gt;&gt;
-            </Text>
+            { guide_message }
           </View>
-          <View style={[ { backgroundColor: this.state.swipecolor }, styles.swiperContainer ]}>
-            <Animated.View
-              {...this.PanResponder.panHandlers}
-              style={[{ transform: this.position.getTranslateTransform() }, styles.swiper ]}>
-              <View style={ styles.rightSwipe }>
-                <Text style={ styles.swiperLabelFake }>Fake</Text>
-              </View>
-              <View style={ styles.leftSwipe }>
-                <Text style={ styles.swiperLabelReal }>Real</Text>
-              </View>
-            </Animated.View>
-          </View>
+          { vsbar }
           <View style={ styles.buttonBar }>
             <TouchableWithoutFeedback>
               <View style={ styles.circleButton }>
